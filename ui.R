@@ -40,7 +40,7 @@ ui <- fluidPage(
       ),
       
       br(),
-
+      
       sliderInput(
         "alpha_input", 
         "Alpha transparency of points", 
@@ -55,17 +55,38 @@ ui <- fluidPage(
       
       br(),
       
+      sliderInput(
+        "mean_size_input", 
+        "Size of sample compositional mean", 
+        min = 0, 
+        max = 30,
+        value = 20, 
+        step = 2, 
+        round = FALSE, 
+        ticks = FALSE
+      ),
+      
+      radioButtons(
+        "mean_shape_input", 
+        "Shape of sample compositional mean",
+        c("circle", "circle-open", "cross", "diamond", "diamond-open", "square", "square-open"), 
+        "cross", 
+        inline = FALSE
+      ),
+      
+      br(),
+      
       checkboxInput(
         "axis_inc_input", 
         "Include composition axes", 
         value = TRUE
       ),
       
-      checkboxInput(
-        "geo_mean_input", 
-        "Include sample mean", 
-        value = TRUE
-      ),
+      # checkboxInput(
+      #   "geo_mean_input", 
+      #   "Include sample mean", 
+      #   value = TRUE
+      # ),
       
 
       br(),
@@ -108,6 +129,11 @@ ui <- fluidPage(
 
         tabPanel(
           "Fat mass (%)",
+          br(),
+          p(
+            "Please click and drag to rotate and scroll to zoom", 
+            style = "font-size: 9pt;"
+          ),
           plotlyOutput("plot1", height = px_h_plot, width = px_w_plot)
         ),
         

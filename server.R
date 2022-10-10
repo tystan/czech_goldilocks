@@ -13,8 +13,12 @@ shinyServer(function(input, output, session) {
     input$axis_inc_input
   })
   
-  geo_mean_select <- reactive({
-    input$geo_mean_input
+  mean_size_select <- reactive({
+    input$mean_size_input
+  })
+  
+  mean_shape_select <- reactive({
+    input$mean_shape_input
   })
   
   alpha_select <- reactive({
@@ -51,7 +55,7 @@ shinyServer(function(input, output, session) {
         add_axis(., tetra_axis_lst_hrs[[4]]) 
     }
     
-    if (geo_mean_select()) {
+    if (mean_size_select() > 0) {
       fmp_plot <- 
         fmp_plot %>%
         add_trace(
@@ -66,7 +70,11 @@ shinyServer(function(input, output, session) {
           color = I("black"),
           showlegend = FALSE,
           opacity = 1,
-          marker = list(size = 20, symbol = "cross") # "circle-open"
+          marker = 
+            list(
+              size = mean_size_select(), 
+              symbol = mean_shape_select()
+            ) # "circle-open"
         ) 
     }
     

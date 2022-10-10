@@ -2,49 +2,16 @@
 
 # ---- libs ----
 
+### removed this as issues with using github package when using shinyapps.io
+# devtools::install_github('tystan/simplexity') 
+# library("simplexity")
+
 library("shiny")
 library("shinythemes")
-# devtools::install_github('tystan/simplexity') 
-library("simplexity")
 library("readr")
 library("dplyr")
 library("plotly")
 library("foreach")
-
-
-# ---- read ----
-
-fmp <- read_csv("dat/fmp_pred_adol_newcomp.csv")
-fmp <- 
-  fmp %>%
-  rename(`FM%` = pred)
-
-fmp_mean <- col_geo_mean(fmp[, c("sleep", "sb", "lpa", "mvpa")])
-fmp_mean <- clo(fmp_mean)
-fmp_mean <- matrix(fmp_mean, nrow = 1)
-sum(fmp_mean)
-fmp_mean
-
-
-fmp_mean_tetra_coord <- 
-  cbind(
-    trans_comp_to_tetra(fmp_mean),
-    obs_labs = 
-      paste0(
-        "Time-use sample mean",
-        "<br>sleep = ", sprintf("%6.2f", 24 * fmp_mean[1, 1]),
-        "<br>sb = ", sprintf("%6.2f", 24 * fmp_mean[1, 2]),
-        "<br>lpa = ", sprintf("%6.2f", 24 * fmp_mean[1, 3]),
-        "<br>mvpa = ", sprintf("%6.2f", 24 * fmp_mean[1, 4])
-      )
-  )
-
-
-
-vfa <- read_csv("dat/vfa_pred_child_newcomp.csv")
-vfa <- 
-  vfa %>%
-  rename(VAT = pred)
 
 # ---- consts ----
 
@@ -62,8 +29,117 @@ plotly_col_pals <-
     "Viridis", "YlGnBu", "YlOrRd"
   )
 
+# ---- funcs_from_simplexity ----
+
+# can't use github.com/tystan/simplexity package yet as not on CRAN
+
+#' Transform 4-simplex data to a 3-D plotting coordinates
+#'
+#' @author Ty Stanford <tystan@gmail.com>
+#' @description Transform 4-simplex data to a 3-D plotting coordinates
+#' @param comp_dat a matrix of \code{n} observations (rows) and \code{4} compositional components (columns)
+#' @param warn (default \code{FALSE}) The closure operation to 1 is applied to 
+#' the observations in \code{comp_dat}, should a warning about pre-closure observations not being 1 be printed?
+#' @export
+#' @details
+#' Returns a \code{n x 4} \code{data.frame} of \code{(x, y, z)} 3-D plotting coordinates.
+#'
+#' @examples
+#' (grid_4simplex <- mk_simplex_grid(4, 0.2, rm_edges = TRUE, nc = 1))
+#' trans_comp_to_tetra(grid_4simplex)
+#' 
+
+
+trans_comp_to_tetra <- function(comp_dat, warn = FALSE) {
+  
+  comp_dat <- clos_check(comp_dat, warn = warn)
+  
+  c4 <- 9 / 2
+  c5 <- 5
+  # n <- nrow(comp_dat)
+  # note: if using matrix algebra then use c_mat
+  # however, using the constant c5 saves memory
+  # c_mat <- matrix(c5, nrow = n, ncol = 3)
+  
+  trans_mat <-
+    c4 *
+    matrix(
+      c(
+        1, -1, -1,  1,
+        -1,  1, -1,  1,
+        1,  1, -1, -1
+      ),
+      ncol = 4,
+      byrow = TRUE
+    )
+  
+  xyz <- comp_dat %*% t(trans_mat) + c5 # or + c_mat
+  xyz <- as.data.frame(xyz)
+  colnames(xyz) <- letters[24:26]
+  
+  return(xyz)
+  
+}
+
+#' Check that rows sum up to the closure value
+
+#' @author Ty Stanford <tystan@gmail.com>
+#' @description Check that rows sum up to the closure value
+#' @param x \code{data.frame} or \code{matrix} with of \code{n} observations (rows) and \code{D} compositional components (columns)
+#' @param clo_val a positive closure value to check each row sums to this
+#' @param warn (default \code{TRUE}) should a warning about pre-closure observations not being \code{clo_val} be printed?
+#' @export
+
+#' @examples 
+#' (c_dat1 <- matrix(c(rep(0.25, 4), 1:4 / 10, 1:4), byrow = TRUE, ncol = 4))
+#' clos_check(c_dat1)
+#' (c_dat2 <- matrix(c(rep(0.25, 4), 1:4 / 10)     , byrow = TRUE, ncol = 4))
+#' clos_check(c_dat2)
+#' (c_dat3 <- matrix(c(rep(0.25, 4), 1:4 / 10, 1:4), byrow = TRUE, ncol = 4))
+#' clos_check(c_dat3, clo_val = 10)
+#' (c_dat4 <- 3 * matrix(c(rep(0.25, 4), 1:4 / 10), byrow = TRUE, ncol = 4))
+#' clos_check(c_dat4, 3)
+#' 
+#' 
+clos_check <- function(x, clo_val = 1, warn = TRUE) {
+  rwsms <- rowSums(x)
+  rwsms_diffs <- abs(rwsms - clo_val)
+  rwsms_not_clos <- rwsms_diffs > 1e-8
+  if (any(rwsms_not_clos)) {
+    if (warn) {
+      cat(
+        "NOTE: closure operator being applied to rows as ",
+        sum(rwsms_not_clos),
+        " row(s) are not closed to ",
+        clo_val,
+        ".\n",
+        sep = ""
+      )
+    }
+    x <- row_wise_closure(x, clo_val = clo_val)
+  }
+  return(x)
+}
+
+#' Apply closure operator over rows
+
+#' @author Ty Stanford <tystan@gmail.com>
+#' @description Apply closure operator over rows
+#' @param y \code{data.frame} or \code{matrix} with of \code{n} observations (rows) and \code{D} compositional components (columns)
+#' @param clo_val a positive value for each row to be closed to (i.e., each rows sums to this)
+#' @export
+#'
+#' @examples
+#' (c_dat1 <- matrix(c(rep(0.25, 4), 1:4 / 10, 1:4), byrow = TRUE, ncol = 4))
+#' row_wise_closure(c_dat1)
+
+row_wise_closure <- function(y, clo_val = 1) {
+  clo_val * t(apply(y, 1, function(x) x / sum(x)))
+}
+
 
 # ---- funcs ----
+
 
 
 col_geo_mean <- function(x) {
@@ -267,6 +343,41 @@ add_surf <- function(plot, dat) {
     ) 
 }
 
+
+
+# ---- read ----
+
+fmp <- read_csv("dat/fmp_pred_adol_newcomp.csv")
+fmp <- 
+  fmp %>%
+  rename(`FM%` = pred)
+
+fmp_mean <- col_geo_mean(fmp[, c("sleep", "sb", "lpa", "mvpa")])
+fmp_mean <- clo(fmp_mean)
+fmp_mean <- matrix(fmp_mean, nrow = 1)
+sum(fmp_mean)
+fmp_mean
+
+
+fmp_mean_tetra_coord <- 
+  cbind(
+    trans_comp_to_tetra(fmp_mean),
+    obs_labs = 
+      paste0(
+        "Time-use sample mean",
+        "<br>sleep = ", sprintf("%6.2f", 24 * fmp_mean[1, 1]),
+        "<br>sb = ", sprintf("%6.2f", 24 * fmp_mean[1, 2]),
+        "<br>lpa = ", sprintf("%6.2f", 24 * fmp_mean[1, 3]),
+        "<br>mvpa = ", sprintf("%6.2f", 24 * fmp_mean[1, 4])
+      )
+  )
+
+
+
+vfa <- read_csv("dat/vfa_pred_child_newcomp.csv")
+vfa <- 
+  vfa %>%
+  rename(VAT = pred)
 
 
 # ---- fmp_setup ----
