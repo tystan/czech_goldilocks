@@ -170,7 +170,7 @@ ui <- fluidPage(
             ),
             p(
               "CL Rasmussen, A Gába, T Stanford, J Dygrýn, D Dumuid, D Janda, and K Hron.", 
-              em("The Goldilocks Day for preventing excess adiposity among children and adolescents."),
+              em("The Goldilocks Day for healthy adiposity measures among children and adolescents."),
               "Manuscript to be submitted."
               # a(
               #   href = "https://linktobecreated.com", 
@@ -194,40 +194,6 @@ ui <- fluidPage(
           
           br(),
           
-          # fluidRow(
-          #   column(
-          #     width = 6,
-          #          
-          #     wellPanel(
-          #       tags$ul(
-          #         tags$li("The plot is rendered using 1 x 1Ghz processor, so may take up to 10 sec to appear"),
-          #         tags$li("Best graphical display requires window width >1000px"),
-          #         tags$li("Please click and drag to rotate plot or scroll to zoom in/out")
-          #       ), 
-          #       style = "font-size: 9pt;"
-          #     )
-          #   ),
-          #   
-          #   column(
-          #     width = 6,
-          #     
-          #     wellPanel(
-          #       # tags$p(
-          #       #   "Note:",
-          #       #   style = "font-size: 10pt;"
-          #       # ), 
-          #       tags$ul(
-          #         tags$li(strong("sleep + sb + lpa + mvpa = 24 hours")),
-          #         tags$li(strong("sleep:"), "hours spent in sleep"),
-          #         tags$li(strong("sb:"), "hours spent in sedentary behaviour"),
-          #         tags$li(strong("lpa:"), "hours spent in light physical activity"),
-          #         tags$li(strong("mvpa:"), "hours spent in moderate-to-vigorous physical activity")
-          #       ),
-          #       style = "font-size: 9pt;"
-          #     )
-          #   )
-          #   
-          # ),
           
           plotlyOutput("plot2", height = px_h_plot, width = px_w_plot),
           
@@ -247,7 +213,7 @@ ui <- fluidPage(
             ),
             p(
               "CL Rasmussen, A Gába, T Stanford, J Dygrýn, D Dumuid, D Janda, and K Hron.", 
-              em("The Goldilocks Day for preventing excess adiposity among children and adolescents."),
+              em("The Goldilocks Day for healthy adiposity measures among children and adolescents."),
               "Manuscript to be submitted."
               # a(
               #   href = "https://linktobecreated.com", 

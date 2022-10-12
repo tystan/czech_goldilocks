@@ -5,7 +5,7 @@ Shiny app of plotly interactive 3D tetrahedron (4-simplex) of time-use of 659 Cz
 ## Reference
 
 CL Rasmussen, A Gába, T Stanford, J Dygrýn, D Dumuid, D Janda, and K Hron.
-*The Goldilocks Day for preventing excess adiposity among children and adolescents*.
+*The Goldilocks Day for healthy adiposity measures among children and adolescents*.
 Manuscript to be submitted.
 
 
