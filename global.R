@@ -13,11 +13,15 @@ library("dplyr")
 library("plotly")
 library("foreach")
 
+# library("miniUI")
+
 # ---- consts ----
 
-px_h_plot <- "750px"
+px_h_plot <- "550px"
 px_w_plot <- "900px"
 
+
+comp_labs <- c("sleep", "sb", "lpa", "mvpa")
 
 plotly_col_pals <-
   c(
@@ -157,6 +161,14 @@ clo <- function(x, clo_val = 1) {
   clo_val * x / sum(x)
 }
 
+comp_coord_str <- function(x) {
+  paste0(
+    "(sleep, sb, lpa, mvpa) = (",
+    paste(x, collapse = ", "),
+    ")"
+  )
+}
+
 
 ### NOTE: colour choices for plotly palettes
 # Blackbody,Bluered,Blues,
@@ -175,7 +187,7 @@ plot_4_comp <- function(comp_data, x1, x2, x3, x4, col = NULL, alpha = 0.9, pal 
     col <- "col"
     comp_data[[col]] <- 1
   } else {
-    obs_labs <- paste0("<br>", col, " = ", sprintf("%6.2f", comp_data[[col]]))
+    obs_labs <- paste0("<br>", col, " = ", sprintf("%2.1f", comp_data[[col]]))
   }
   
   null_axis <- 
@@ -190,10 +202,11 @@ plot_4_comp <- function(comp_data, x1, x2, x3, x4, col = NULL, alpha = 0.9, pal 
   obs_labs <-
     paste0(
       obs_labs,
-      "<br>", x1, " = ", sprintf("%6.2f", comp_data[[x1]]),
-      "<br>", x2, " = ", sprintf("%6.2f", comp_data[[x2]]),
-      "<br>", x3, " = ", sprintf("%6.2f", comp_data[[x3]]),
-      "<br>", x4, " = ", sprintf("%6.2f", comp_data[[x4]])
+      "<br>(", x1, ", ", x2, ", ", x3, ", ", x4, ") = ", 
+      sprintf(
+        "(%2.1f, %2.1f, %2.1f, %1.2f)", 
+        comp_data[[x1]], comp_data[[x2]], comp_data[[x3]], comp_data[[x4]]
+      )
     )
   
   comp_mat <- as.matrix(comp_data[, c(x1, x2, x3, x4)])
@@ -207,11 +220,18 @@ plot_4_comp <- function(comp_data, x1, x2, x3, x4, col = NULL, alpha = 0.9, pal 
       obs_labs = obs_labs
     )
   
-  
   vert_comp <- diag(4)
   vert_labs_txt <- c(x1, x2, x3, x4) 
+  vert_labs_hover <-  
+    paste0(
+      "(", x1, ", ", x2, ", ", x3, ", ", x4, ") = ", 
+      sprintf(
+        "(%2.0f, %2.0f, %2.0f, %1.0f)", 
+        24 * vert_comp[, 1], 24 * vert_comp[, 2], 24 * vert_comp[, 3], 24 * vert_comp[, 4]
+      )
+    )
   vertex_dat <- trans_comp_to_tetra(vert_comp, warn = TRUE)
-  vert_labs_dat <- cbind(vertex_dat, txt = vert_labs_txt)
+  vert_labs_dat <- cbind(vertex_dat, txt = vert_labs_txt, hover = vert_labs_hover)
   colnames(vertex_dat) <- paste0("V", 1:3)
   
   edge_dat <-
@@ -268,11 +288,27 @@ plot_4_comp <- function(comp_data, x1, x2, x3, x4, col = NULL, alpha = 0.9, pal 
       y = edge_dat[["V2"]], 
       z = edge_dat[["V3"]], 
       type = 'scatter3d', 
-      mode = 'lines+markers', 
+      mode = 'lines', 
       opacity = 1,
       line = list(color = 'black', width = 1),
+      showlegend = FALSE,
+      hoverinfo = "skip"
+    )
+  
+  # create tetra vertices
+  plty <- 
+    plty %>%
+    add_trace(
+      x = vertex_dat[["V1"]], 
+      y = vertex_dat[["V2"]], 
+      z = vertex_dat[["V3"]], 
+      type = 'scatter3d', 
+      mode = 'markers', 
+      opacity = 1,
       marker = list(color = 'black'),
-      showlegend = FALSE
+      showlegend = FALSE,
+      hoverinfo = "text",
+      hovertext = vert_labs_dat[["hover"]]
     )
   
   # label vertices
@@ -283,7 +319,10 @@ plot_4_comp <- function(comp_data, x1, x2, x3, x4, col = NULL, alpha = 0.9, pal 
       y = vert_labs_dat[["y"]], 
       z = vert_labs_dat[["z"]], 
       text = vert_labs_dat[["txt"]],
-      showlegend = FALSE
+      showlegend = FALSE,
+      # hovertext = vert_labs_dat[["hover"]],
+      # hoverinfo = "text"
+      hoverinfo = "skip"
     )
   
   
@@ -297,7 +336,7 @@ plot_4_comp <- function(comp_data, x1, x2, x3, x4, col = NULL, alpha = 0.9, pal 
         xaxis = null_axis,
         yaxis = null_axis,
         zaxis = null_axis,
-        camera = list(eye = list(x = 2, y = 1, z = -1))
+        camera = list(eye = list(x = 4/3, y = 2/3, z = -2/3))
       )
     )
   
@@ -308,17 +347,32 @@ plot_4_comp <- function(comp_data, x1, x2, x3, x4, col = NULL, alpha = 0.9, pal 
 
 
 add_axis <- function(plot, dat) {
+  
+
+  
   plot %>%
     add_trace(
       x = dat[["x"]], 
       y = dat[["y"]], 
       z = dat[["z"]], 
       type = 'scatter3d', 
-      mode = 'lines+markers', 
+      mode = 'lines', 
       opacity = 1,
       line = list(color = 'black', width = 0.5, opacity  = 0.2),
+      showlegend = FALSE,
+      hoverinfo = "skip"
+    ) %>% 
+    add_trace(
+      x = dat[["x"]], 
+      y = dat[["y"]], 
+      z = dat[["z"]], 
+      type = 'scatter3d', 
+      mode = 'markers', 
+      opacity = 1,
       marker = list(color = 'black', opacity = 0.2, size = 2, symbol = "x-thin-open"),
-      showlegend = FALSE
+      showlegend = FALSE,
+      hovertext = dat[["txt2"]],
+      hoverinfo = "text"
     ) %>% 
     add_text(
       x = dat[["x"]], 
@@ -326,28 +380,43 @@ add_axis <- function(plot, dat) {
       z = dat[["z"]], 
       text = dat[["txt"]], 
       opacity = 0.2,
-      showlegend = FALSE
+      showlegend = FALSE,
+      hoverinfo = "skip"
     )
 }
 
-add_surf <- function(plot, dat) {
-  plot %>%
-    add_trace(
-      x = dat[["x"]], 
-      y = dat[["y"]], 
-      z = dat[["z"]], 
-      type = 'mesh3d', 
-      opacity = 0.2,
-      showlegend = FALSE,
-      hovertext = NULL
-    ) 
-}
+
+### currently not using bounds
+# add_surf <- function(plot, dat) {
+#   plot %>%
+#     add_trace(
+#       x = dat[["x"]], 
+#       y = dat[["y"]], 
+#       z = dat[["z"]], 
+#       type = 'mesh3d', 
+#       opacity = 0.2,
+#       showlegend = FALSE,
+#       hovertext = NULL
+#     ) 
+# }
 
 
 
 # ---- read ----
 
-fmp <- read_csv("dat/fmp_pred_adol_newcomp.csv")
+fmp <- 
+  read_csv(
+    "dat/fmp_pred_adol_newcomp.csv",
+    col_types = 
+      cols(
+        obs = col_double(),
+        pred = col_double(),
+        sleep = col_double(),
+        sb = col_double(),
+        lpa = col_double(),
+        mvpa = col_double()
+      )
+  )
 fmp <- 
   fmp %>%
   rename(`FM%` = pred)
@@ -364,30 +433,64 @@ fmp_mean_tetra_coord <-
     trans_comp_to_tetra(fmp_mean),
     obs_labs = 
       paste0(
-        "Time-use sample mean",
-        "<br>sleep = ", sprintf("%6.2f", 24 * fmp_mean[1, 1]),
-        "<br>sb = ", sprintf("%6.2f", 24 * fmp_mean[1, 2]),
-        "<br>lpa = ", sprintf("%6.2f", 24 * fmp_mean[1, 3]),
-        "<br>mvpa = ", sprintf("%6.2f", 24 * fmp_mean[1, 4])
+        "Time-use sample compositional mean<br>",
+        "(sleep, sb, lpa, mvpa) = (", 
+        sprintf("%2.1f", 24 * fmp_mean[1, 1]), ", ",
+        sprintf("%2.1f", 24 * fmp_mean[1, 2]), ", ",
+        sprintf("%2.1f", 24 * fmp_mean[1, 3]), ", ",
+        sprintf("%2.2f", 24 * fmp_mean[1, 4]), 
+        ")"
       )
   )
 
 
 
-vfa <- read_csv("dat/vfa_pred_child_newcomp.csv")
+vfa <- 
+  read_csv(
+    "dat/vfa_pred_child_newcomp.csv",
+    col_types = 
+      cols(
+        obs = col_double(),
+        pred = col_double(),
+        sleep = col_double(),
+        sb = col_double(),
+        lpa = col_double(),
+        mvpa = col_double()
+      )
+  )
 vfa <- 
   vfa %>%
   rename(VAT = pred)
 
+vfa_mean <- col_geo_mean(vfa[, c("sleep", "sb", "lpa", "mvpa")])
+vfa_mean <- clo(vfa_mean)
+vfa_mean <- matrix(vfa_mean, nrow = 1)
+sum(vfa_mean)
+vfa_mean
 
-# ---- fmp_setup ----
+
+vfa_mean_tetra_coord <- 
+  cbind(
+    trans_comp_to_tetra(vfa_mean),
+    obs_labs = 
+      paste0(
+        "Time-use sample compositional mean<br>",
+        "(sleep, sb, lpa, mvpa) = (", 
+        sprintf("%2.1f", 24 * vfa_mean[1, 1]), ", ",
+        sprintf("%2.1f", 24 * vfa_mean[1, 2]), ", ",
+        sprintf("%2.1f", 24 * vfa_mean[1, 3]), ", ",
+        sprintf("%2.2f", 24 * vfa_mean[1, 4]), 
+        ")"
+      )
+  )
 
 
 
-fmp_mean <- col_geo_mean(fmp[, c("sleep", "sb", "lpa", "mvpa")])
-fmp_mean <- clo(fmp_mean)
-sum(fmp_mean)
-fmp_mean
+
+# ---- axis_data_setup ----
+
+
+
 
 s <- seq(0, 1, 0.25)
 strt <- c(0, 0, 0, 0)
@@ -433,42 +536,49 @@ for (j in 1:4) {
 }
 
 
+
 tetra_axis_lst_hrs <- tetra_axis_lst
 for (i in 1:4) {
   tetra_axis_lst_hrs[[i]][["txt"]] <-
     24 * tetra_axis_lst_hrs[[i]][["txt"]]
+  
+  axis_comp <- matrix(0, ncol = 4, nrow = nrow(tetra_axis_lst_hrs[[i]]))
+  axis_comp[, i] <- tetra_axis_lst_hrs[[i]][["txt"]]
+  for (j in 1:nrow(tetra_axis_lst_hrs[[i]])) {
+    axis_comp[j, -i] <- (24 - tetra_axis_lst_hrs[[i]][["txt"]][j]) / 3
+  }
+  tetra_axis_lst_hrs[[i]][["txt2"]] <- apply(axis_comp, 1, comp_coord_str)
+  tetra_axis_lst_hrs[[i]][["txt2"]] <-
+    paste0(comp_labs[i], " axis<br>", tetra_axis_lst_hrs[[i]][["txt2"]])
+  
 }
 
 
+tetra_axis_lst_hrs
 
 
 
-# ---- vfa_setup ----
+# ---- axis_setup2 ----
 
 
 
-# vfa_mean <- col_geo_mean(vfa[, c("sleep", "sb", "lpa", "mvpa")])
-# vfa_mean <- clo(vfa_mean)
-# sum(vfa_mean)
-# vfa_mean
-# 
 # s <- seq(0, 1, 0.25)
 # strt <- c(0, 0, 0, 0)
 # 
 # tetra_axis_lst <- vector(mode = "list", length = 4)
 # for (j in 1:4) {
-#   
+# 
 #   strt_j <- strt
 #   strt_j[j] <- 1
 #   fnsh_j <- (1 - strt_j) / 3 # c(0, 1/3, 1/3, 1/3)
-#   
-#   axis_seq <- 
+# 
+#   axis_seq <-
 #     foreach(i =  1:length(s), .combine = rbind) %do% {
-#       s[i] * strt_j + (1 - s[i]) * fnsh_j 
+#       s[i] * strt_j + (1 - s[i]) * fnsh_j
 #     }
-#   
+# 
 #   tetra_tmp <- cbind(trans_comp_to_tetra(axis_seq), txt = s)
-#   
+# 
 #   tetra_axis_lst[[j]] <- tetra_tmp
 # }
 # 
@@ -476,12 +586,12 @@ for (i in 1:4) {
 # tetra_surf_lst <- vector(mode = "list", length = 4)
 # m_vec <- vfa_mean
 # for (j in 1:4) {
-#   
+# 
 #   offset_tmp <- rep(0, 4)
 #   offset_tmp[j] <- m_vec[j]
 #   # offset_tmp <- clo(offset_tmp)
-#   
-#   surf_plane <- 
+# 
+#   surf_plane <-
 #     foreach(i =  1:4, .combine = rbind) %do% {
 #       if (i == j) {
 #         NULL
@@ -491,22 +601,25 @@ for (i in 1:4) {
 #         clo(offset_tmp_i)
 #       }
 #     }
-#   
+# 
 #   tetra_tmp <- trans_comp_to_tetra(surf_plane)
-#   
+# 
 #   tetra_surf_lst[[j]] <- tetra_tmp
 # }
-# 
-# 
+
+
+# ---- constraint_surfaces ----
+
+### NOTE: not used in current iteration
 # tetra_surf_min_lst <- vector(mode = "list", length = 4)
 # m_vec <- apply(vfa[, c("sleep", "sb", "lpa", "mvpa")], 2, min)
 # for (j in 1:4) {
-#   
+# 
 #   offset_tmp <- rep(0, 4)
 #   offset_tmp[j] <- m_vec[j]
 #   # offset_tmp <- clo(offset_tmp)
-#   
-#   surf_plane <- 
+# 
+#   surf_plane <-
 #     foreach(i =  1:4, .combine = rbind) %do% {
 #       if (i == j) {
 #         NULL
@@ -516,9 +629,9 @@ for (i in 1:4) {
 #         clo(offset_tmp_i)
 #       }
 #     }
-#   
+# 
 #   tetra_tmp <- trans_comp_to_tetra(surf_plane)
-#   
+# 
 #   tetra_surf_min_lst[[j]] <- tetra_tmp
 # }
 # 
@@ -526,12 +639,12 @@ for (i in 1:4) {
 # tetra_surf_max_lst <- vector(mode = "list", length = 4)
 # m_vec <- apply(vfa[, c("sleep", "sb", "lpa", "mvpa")], 2, max)
 # for (j in 1:4) {
-#   
+# 
 #   offset_tmp <- rep(0, 4)
 #   offset_tmp[j] <- m_vec[j]
 #   # offset_tmp <- clo(offset_tmp)
-#   
-#   surf_plane <- 
+# 
+#   surf_plane <-
 #     foreach(i =  1:4, .combine = rbind) %do% {
 #       if (i == j) {
 #         NULL
@@ -541,9 +654,9 @@ for (i in 1:4) {
 #         clo(offset_tmp_i)
 #       }
 #     }
-#   
+# 
 #   tetra_tmp <- trans_comp_to_tetra(surf_plane)
-#   
+# 
 #   tetra_surf_max_lst[[j]] <- tetra_tmp
 # }
 

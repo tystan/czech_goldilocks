@@ -29,6 +29,90 @@ shinyServer(function(input, output, session) {
   output$plot1 <- renderPlotly({
 
     
+    vfa_plot <- 
+      plot_4_comp(
+        vfa %>%
+          mutate(
+            sleep = 24 * sleep,
+            sb = 24 * sb,
+            lpa = 24 * lpa,
+            mvpa = 24 * mvpa
+          ), 
+        "sleep", "sb", "lpa", "mvpa", 
+        col = "VAT", 
+        alpha = alpha_select(),
+        pal = pal_select()
+      )
+    
+    
+
+    if (axis_inc_select()) {
+      vfa_plot <- 
+        vfa_plot %>%
+        add_axis(., tetra_axis_lst_hrs[[1]]) %>%
+        add_axis(., tetra_axis_lst_hrs[[2]]) %>%
+        add_axis(., tetra_axis_lst_hrs[[3]]) %>%
+        add_axis(., tetra_axis_lst_hrs[[4]]) 
+    }
+    
+    if (mean_size_select() > 0) {
+      vfa_plot <- 
+        vfa_plot %>%
+        add_trace(
+          type = "scatter3d",
+          mode = "markers",
+          data = vfa_mean_tetra_coord,
+          x = ~x, 
+          y = ~y, 
+          z = ~z, 
+          hovertext = ~obs_labs,
+          hoverinfo = "text",
+          color = I("black"),
+          showlegend = FALSE,
+          opacity = 1,
+          marker = 
+            list(
+              size = mean_size_select(), 
+              symbol = mean_shape_select()
+            ) # "circle-open"
+        ) 
+    }
+    
+
+    # print(vfa_plot$x$cur_data)
+    # print(vfa_plot$x$visdat)
+    # print(vfa_plot$x$layoutAttrs[[vfa_plot$x$cur_data]])
+    
+    # style(
+    #   vfa_plot,
+    #   marker = list(
+    #     # coloraxis = "coloraxis",
+    #     color = ~col,
+    #     showscale = TRUE,
+    #     colorscale = pal_select(),
+    #     colorbar = list(
+    #       len = 0.5,
+    #       title = list(
+    #         text = col,
+    #         font = list(
+    #           size = 20
+    #         )
+    #       )
+    #     )
+    #   ),
+    #   traces = 0
+    # )
+    
+    
+    vfa_plot
+    
+
+  })
+
+
+  output$plot2 <- renderPlotly({
+    
+    
     fmp_plot <- 
       plot_4_comp(
         fmp %>%
@@ -45,7 +129,7 @@ shinyServer(function(input, output, session) {
       )
     
     
-
+    
     if (axis_inc_select()) {
       fmp_plot <- 
         fmp_plot %>%
@@ -78,7 +162,7 @@ shinyServer(function(input, output, session) {
         ) 
     }
     
-
+    
     # print(fmp_plot$x$cur_data)
     # print(fmp_plot$x$visdat)
     # print(fmp_plot$x$layoutAttrs[[fmp_plot$x$cur_data]])
@@ -106,10 +190,9 @@ shinyServer(function(input, output, session) {
     
     fmp_plot
     
-
+    
   })
-
-
+  
   # outputOptions(output, "audit", suspendWhenHidden = FALSE)
 
 
