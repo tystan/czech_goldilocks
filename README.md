@@ -1,6 +1,6 @@
 # `czech_goldilocks`
 
-Shiny app of plotly interactive 3D tetrahedron (4-simplex) of time-use of 659 Czech children and adolescents and compositional model predicted adiposity measures.
+Shiny app of plotly interactive 3D tetrahedron (4-simplex) of time-use of 659 Czech children and adolescents and predicted adiposity measures based on linear compostional regression models.
 
 ## Reference
 

@@ -21,7 +21,7 @@ px_h_plot <- "550px"
 px_w_plot <- "900px"
 
 
-comp_labs <- c("sleep", "sb", "lpa", "mvpa")
+comp_labs <- c("sleep", "SB", "LPA", "MVPA")
 
 plotly_col_pals <-
   c(
@@ -163,7 +163,7 @@ clo <- function(x, clo_val = 1) {
 
 comp_coord_str <- function(x) {
   paste0(
-    "(sleep, sb, lpa, mvpa) = (",
+    "(sleep, SB, LPA, MVPA) = (",
     paste(x, collapse = ", "),
     ")"
   )
@@ -419,9 +419,12 @@ fmp <-
   )
 fmp <- 
   fmp %>%
-  rename(`FM%` = pred)
+  rename(`FM%` = pred,
+         `SB` = sb,
+         `LPA` = lpa,
+         `MVPA` = mvpa)
 
-fmp_mean <- col_geo_mean(fmp[, c("sleep", "sb", "lpa", "mvpa")])
+fmp_mean <- col_geo_mean(fmp[, c("sleep", "SB", "LPA", "MVPA")])
 fmp_mean <- clo(fmp_mean)
 fmp_mean <- matrix(fmp_mean, nrow = 1)
 sum(fmp_mean)
@@ -434,7 +437,7 @@ fmp_mean_tetra_coord <-
     obs_labs = 
       paste0(
         "Time-use sample compositional mean<br>",
-        "(sleep, sb, lpa, mvpa) = (", 
+        "(sleep, SB, LPA, MVPA) = (", 
         sprintf("%2.1f", 24 * fmp_mean[1, 1]), ", ",
         sprintf("%2.1f", 24 * fmp_mean[1, 2]), ", ",
         sprintf("%2.1f", 24 * fmp_mean[1, 3]), ", ",
@@ -460,9 +463,12 @@ vfa <-
   )
 vfa <- 
   vfa %>%
-  rename(VAT = pred)
+  rename(VAT = pred,
+         `SB` = sb,
+         `LPA` = lpa,
+         `MVPA` = mvpa)
 
-vfa_mean <- col_geo_mean(vfa[, c("sleep", "sb", "lpa", "mvpa")])
+vfa_mean <- col_geo_mean(vfa[, c("sleep", "SB", "LPA", "MVPA")])
 vfa_mean <- clo(vfa_mean)
 vfa_mean <- matrix(vfa_mean, nrow = 1)
 sum(vfa_mean)
@@ -475,7 +481,7 @@ vfa_mean_tetra_coord <-
     obs_labs = 
       paste0(
         "Time-use sample compositional mean<br>",
-        "(sleep, sb, lpa, mvpa) = (", 
+        "(sleep, SB, LPA, MVPA) = (", 
         sprintf("%2.1f", 24 * vfa_mean[1, 1]), ", ",
         sprintf("%2.1f", 24 * vfa_mean[1, 2]), ", ",
         sprintf("%2.1f", 24 * vfa_mean[1, 3]), ", ",

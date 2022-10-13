@@ -34,11 +34,11 @@ shinyServer(function(input, output, session) {
         vfa %>%
           mutate(
             sleep = 24 * sleep,
-            sb = 24 * sb,
-            lpa = 24 * lpa,
-            mvpa = 24 * mvpa
+            SB = 24 * sb,
+            LPA = 24 * LPA,
+            MVPA = 24 * MVPA
           ), 
-        "sleep", "sb", "lpa", "mvpa", 
+        "sleep", "SB", "LPA", "MVPA", 
         col = "VAT", 
         alpha = alpha_select(),
         pal = pal_select()
@@ -118,11 +118,11 @@ shinyServer(function(input, output, session) {
         fmp %>%
           mutate(
             sleep = 24 * sleep,
-            sb = 24 * sb,
-            lpa = 24 * lpa,
-            mvpa = 24 * mvpa
+            SB = 24 * SB,
+            LPA = 24 * LPA,
+            MVPA = 24 * MVPA
           ), 
-        "sleep", "sb", "lpa", "mvpa", 
+        "sleep", "SB", "LPA", "MVPA", 
         col = "FM%", 
         alpha = alpha_select(),
         pal = pal_select()
