@@ -34,7 +34,7 @@ shinyServer(function(input, output, session) {
         vfa %>%
           mutate(
             sleep = 24 * sleep,
-            SB = 24 * sb,
+            SB = 24 * SB,
             LPA = 24 * LPA,
             MVPA = 24 * MVPA
           ), 
@@ -206,5 +206,4 @@ shinyServer(function(input, output, session) {
 
 
 })
-
 
