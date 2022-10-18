@@ -33,12 +33,12 @@ shinyServer(function(input, output, session) {
       plot_4_comp(
         vfa %>%
           mutate(
-            sleep = 24 * sleep,
+            Sleep = 24 * Sleep,
             SB = 24 * SB,
             LPA = 24 * LPA,
             MVPA = 24 * MVPA
           ), 
-        "sleep", "SB", "LPA", "MVPA", 
+        "Sleep", "SB", "LPA", "MVPA", 
         col = "VAT", 
         alpha = alpha_select(),
         pal = pal_select()
@@ -117,12 +117,12 @@ shinyServer(function(input, output, session) {
       plot_4_comp(
         fmp %>%
           mutate(
-            sleep = 24 * sleep,
+            Sleep = 24 * Sleep,
             SB = 24 * SB,
             LPA = 24 * LPA,
             MVPA = 24 * MVPA
           ), 
-        "sleep", "SB", "LPA", "MVPA", 
+        "Sleep", "SB", "LPA", "MVPA", 
         col = "FM%", 
         alpha = alpha_select(),
         pal = pal_select()

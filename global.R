@@ -21,7 +21,7 @@ px_h_plot <- "550px"
 px_w_plot <- "900px"
 
 
-comp_labs <- c("sleep", "SB", "LPA", "MVPA")
+comp_labs <- c("Sleep", "SB", "LPA", "MVPA")
 
 plotly_col_pals <-
   c(
@@ -163,7 +163,7 @@ clo <- function(x, clo_val = 1) {
 
 comp_coord_str <- function(x) {
   paste0(
-    "(sleep, SB, LPA, MVPA) = (",
+    "(Sleep, SB, LPA, MVPA) = (",
     paste(x, collapse = ", "),
     ")"
   )
@@ -420,11 +420,12 @@ fmp <-
 fmp <- 
   fmp %>%
   rename(`FM%` = pred,
+         `Sleep` = sleep,
          `SB` = sb,
          `LPA` = lpa,
          `MVPA` = mvpa)
 
-fmp_mean <- col_geo_mean(fmp[, c("sleep", "SB", "LPA", "MVPA")])
+fmp_mean <- col_geo_mean(fmp[, c("Sleep", "SB", "LPA", "MVPA")])
 fmp_mean <- clo(fmp_mean)
 fmp_mean <- matrix(fmp_mean, nrow = 1)
 sum(fmp_mean)
@@ -437,7 +438,7 @@ fmp_mean_tetra_coord <-
     obs_labs = 
       paste0(
         "Time-use sample compositional mean<br>",
-        "(sleep, SB, LPA, MVPA) = (", 
+        "(Sleep, SB, LPA, MVPA) = (", 
         sprintf("%2.1f", 24 * fmp_mean[1, 1]), ", ",
         sprintf("%2.1f", 24 * fmp_mean[1, 2]), ", ",
         sprintf("%2.1f", 24 * fmp_mean[1, 3]), ", ",
@@ -464,11 +465,12 @@ vfa <-
 vfa <- 
   vfa %>%
   rename(VAT = pred,
+         `Sleep` = sleep,
          `SB` = sb,
          `LPA` = lpa,
          `MVPA` = mvpa)
 
-vfa_mean <- col_geo_mean(vfa[, c("sleep", "SB", "LPA", "MVPA")])
+vfa_mean <- col_geo_mean(vfa[, c("Sleep", "SB", "LPA", "MVPA")])
 vfa_mean <- clo(vfa_mean)
 vfa_mean <- matrix(vfa_mean, nrow = 1)
 sum(vfa_mean)
@@ -481,7 +483,7 @@ vfa_mean_tetra_coord <-
     obs_labs = 
       paste0(
         "Time-use sample compositional mean<br>",
-        "(sleep, SB, LPA, MVPA) = (", 
+        "(Sleep, SB, LPA, MVPA) = (", 
         sprintf("%2.1f", 24 * vfa_mean[1, 1]), ", ",
         sprintf("%2.1f", 24 * vfa_mean[1, 2]), ", ",
         sprintf("%2.1f", 24 * vfa_mean[1, 3]), ", ",
@@ -618,7 +620,7 @@ tetra_axis_lst_hrs
 
 ### NOTE: not used in current iteration
 # tetra_surf_min_lst <- vector(mode = "list", length = 4)
-# m_vec <- apply(vfa[, c("sleep", "sb", "lpa", "mvpa")], 2, min)
+# m_vec <- apply(vfa[, c("Sleep", "sb", "lpa", "mvpa")], 2, min)
 # for (j in 1:4) {
 # 
 #   offset_tmp <- rep(0, 4)
@@ -643,7 +645,7 @@ tetra_axis_lst_hrs
 # 
 # 
 # tetra_surf_max_lst <- vector(mode = "list", length = 4)
-# m_vec <- apply(vfa[, c("sleep", "sb", "lpa", "mvpa")], 2, max)
+# m_vec <- apply(vfa[, c("Sleep", "sb", "lpa", "mvpa")], 2, max)
 # for (j in 1:4) {
 # 
 #   offset_tmp <- rep(0, 4)

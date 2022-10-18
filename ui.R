@@ -115,7 +115,7 @@ ui <- fluidPage(
               tags$li("The plots are rendered using a single 1 Ghz processor, so may take up to 10 sec to appear"),
               tags$li("Best graphical display requires window width >1000px"),
               tags$li("Please click and drag to rotate plot or scroll to zoom in/out"),
-                tags$li("Hover mouse over points to get compositional values and prediciton")
+              tags$li("Hover mouse over points to get compositional values and predicition")
             ), 
             style = "font-size: 9pt;"
           )
@@ -130,8 +130,8 @@ ui <- fluidPage(
             #   style = "font-size: 10pt;"
             # ), 
             tags$ul(
-              tags$li(strong("sleep + SB + LPA + MVPA = 24 hours")),
-              tags$li(strong("sleep:"), "hours spent in sleep"),
+              tags$li(strong("Sleep + SB + LPA + MVPA = 24 hours")),
+              tags$li(strong("Sleep:"), "hours spent in sleep"),
               tags$li(strong("SB:"), "hours spent in sedentary behaviour"),
               tags$li(strong("LPA:"), "hours spent in light physical activity"),
               tags$li(strong("MVPA:"), "hours spent in moderate-to-vigorous physical activity")
